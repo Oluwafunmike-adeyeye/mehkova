@@ -9,6 +9,16 @@ import { useCart } from '@/lib/store'
 import { Minus, Plus, ShoppingCart, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import Image from 'next/image'
+import { Suspense } from 'react'
+
+
+export default function CartPage() {
+  return (
+    <Suspense fallback={<div>Loading cart...</div>}>
+      <ProductContent />
+    </Suspense>
+  )
+}
 
 interface Product {
   id: number
@@ -45,7 +55,7 @@ interface CartItem {
   size?: string
 }
 
-export default function ProductPage() {
+function ProductContent() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)

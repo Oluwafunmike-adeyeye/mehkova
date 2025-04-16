@@ -11,8 +11,18 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/auth-context'
 import { toast } from 'sonner'
 import Image from 'next/image'
+import { Suspense } from 'react'
 
 export default function CartPage() {
+  return (
+    <Suspense fallback={<div>Loading cart...</div>}>
+      <CartContent />
+    </Suspense>
+  )
+}
+
+
+function CartContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading } = useAuth()
