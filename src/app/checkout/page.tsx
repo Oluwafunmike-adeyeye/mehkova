@@ -14,8 +14,16 @@ import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { CheckoutFormData } from '@/types/checkout';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { Suspense } from 'react'
 
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
+  )
+}
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
