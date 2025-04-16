@@ -12,8 +12,17 @@ import { signInWithEmailAndPassword, AuthError } from 'firebase/auth'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
