@@ -8,8 +8,6 @@ import { Button } from '@/components/ui/button'
 import { useTheme } from 'next-themes'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { useCartStore } from '@/lib/store'
-import Image from 'next/image'
-import logo from '../../public/logos/logo.png'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged, signOut, User } from 'firebase/auth'
 import { toast } from 'sonner'
@@ -35,11 +33,6 @@ export default function Navbar() {
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ]
-
-  const LOGO_WIDTH = 80
-  const LOGO_HEIGHT = 32
-  const MOBILE_LOGO_WIDTH = 120
-  const MOBILE_LOGO_HEIGHT = 40
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -81,16 +74,9 @@ export default function Navbar() {
               <div className="flex flex-col h-full">
                 <SheetTitle className="mb-6">
                   <Link href="/" onClick={() => setIsOpen(false)}>
-                    <div className="h-10 flex items-center">
-                      <Image 
-                        src={logo} 
-                        alt="Mehkova Logo" 
-                        width={MOBILE_LOGO_WIDTH}
-                        height={MOBILE_LOGO_HEIGHT}
-                        className="dark:hidden object-contain h-full"
-                        priority
-                      />
-                    </div>
+                    <span className="text-xl font-bold text-primary dark:text-primary-foreground">
+                      MEHKOVA
+                    </span>
                   </Link>
                 </SheetTitle>
                 
@@ -164,19 +150,9 @@ export default function Navbar() {
           </Sheet>
 
           <Link href="/" className="flex items-center h-full">
-            <div className="h-10 w-auto flex items-center">
-              <Image 
-                src={logo} 
-                alt="Mehkova Logo" 
-                width={LOGO_WIDTH}
-                height={LOGO_HEIGHT}
-                className="dark:hidden object-contain h-full w-auto"
-                priority
-              />
-              <span className="hidden sm:inline text-xl md:text-2xl font-bold text-primary uppercase ml-2">
-                Mehkova
-              </span>
-            </div>
+            <span className="text-xl md:text-2xl font-bold text-primary uppercase dark:text-primary-foreground hover:text-primary/80 transition-colors">
+              MEHKOVA
+            </span>
           </Link>
         </div>
 
