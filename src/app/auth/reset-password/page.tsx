@@ -24,12 +24,12 @@ export default function ResetPassword() {
     const code = searchParams.get('oobCode')
     if (code) {
       verifyPasswordResetCode(auth, code)
-        .then((email) => {
+        .then(() => {  // Removed unused email parameter
           setOobCode(code)
           setValidLink(true)
         })
         .catch((error: AuthError) => {
-          toast.error('Invalid or expired reset link')
+          toast.error(error.message || 'Invalid or expired reset link')
           setValidLink(false)
         })
     }

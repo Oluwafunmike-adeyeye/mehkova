@@ -13,12 +13,15 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
-const actionTypes = {
+// Convert to type-only enum
+const ACTION_TYPES = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
   DISMISS_TOAST: "DISMISS_TOAST",
   REMOVE_TOAST: "REMOVE_TOAST",
 } as const
+
+type ActionType = typeof ACTION_TYPES[keyof typeof ACTION_TYPES]
 
 let count = 0
 
@@ -29,19 +32,19 @@ function genId() {
 
 type Action =
   | {
-      type: typeof actionTypes["ADD_TOAST"]
+      type: typeof ACTION_TYPES["ADD_TOAST"]
       toast: ToasterToast
     }
   | {
-      type: typeof actionTypes["UPDATE_TOAST"]
+      type: typeof ACTION_TYPES["UPDATE_TOAST"]
       toast: Partial<ToasterToast>
     }
   | {
-      type: typeof actionTypes["DISMISS_TOAST"]
+      type: typeof ACTION_TYPES["DISMISS_TOAST"]
       toastId?: ToasterToast["id"]
     }
   | {
-      type: typeof actionTypes["REMOVE_TOAST"]
+      type: typeof ACTION_TYPES["REMOVE_TOAST"]
       toastId?: ToasterToast["id"]
     }
 
@@ -56,7 +59,7 @@ const addToRemoveQueue = (toastId: string) => {
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId)
-    dispatch({ type: "REMOVE_TOAST", toastId })
+    dispatch({ type: ACTION_TYPES.REMOVE_TOAST, toastId })
   }, TOAST_REMOVE_DELAY)
 
   toastTimeouts.set(toastId, timeout)
@@ -64,13 +67,13 @@ const addToRemoveQueue = (toastId: string) => {
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD_TOAST":
+    case ACTION_TYPES.ADD_TOAST:
       return {
         ...state,
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
       }
 
-    case "UPDATE_TOAST":
+    case ACTION_TYPES.UPDATE_TOAST:
       return {
         ...state,
         toasts: state.toasts.map(t => 
@@ -78,7 +81,7 @@ export const reducer = (state: State, action: Action): State => {
         ),
       }
 
-    case "DISMISS_TOAST": {
+    case ACTION_TYPES.DISMISS_TOAST: {
       const { toastId } = action
 
       // Side effect: Add toasts to remove queue
@@ -98,7 +101,7 @@ export const reducer = (state: State, action: Action): State => {
       }
     }
 
-    case "REMOVE_TOAST":
+    case ACTION_TYPES.REMOVE_TOAST:
       return {
         ...state,
         toasts: action.toastId === undefined
@@ -122,12 +125,12 @@ function toast({ ...props }: ToastOptions) {
   const id = genId()
 
   const update = (props: ToasterToast) =>
-    dispatch({ type: "UPDATE_TOAST", toast: { ...props, id } })
+    dispatch({ type: ACTION_TYPES.UPDATE_TOAST, toast: { ...props, id } })
 
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
+  const dismiss = () => dispatch({ type: ACTION_TYPES.DISMISS_TOAST, toastId: id })
 
   dispatch({
-    type: "ADD_TOAST",
+    type: ACTION_TYPES.ADD_TOAST,
     toast: {
       ...props,
       id,
@@ -153,7 +156,7 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    dismiss: (toastId?: string) => dispatch({ type: ACTION_TYPES.DISMISS_TOAST, toastId }),
   }
 }
 

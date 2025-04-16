@@ -57,7 +57,7 @@ export default function ContactPage() {
       >
         <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 text-primary">Contact Us</h1>
         <p className="text-lg sm:text-xl text-muted-foreground">
-          We&apos;d love to hear from you. Send us a message and we'll respond as soon as possible.
+          We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
         </p>
       </motion.div>
 
