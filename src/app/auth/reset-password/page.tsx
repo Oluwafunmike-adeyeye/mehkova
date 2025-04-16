@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { verifyPasswordResetCode, confirmPasswordReset } from 'firebase/auth'
+import { verifyPasswordResetCode, confirmPasswordReset, AuthError } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,6 @@ export default function ResetPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [oobCode, setOobCode] = useState('')
-  const [email, setEmail] = useState('')
   const [validLink, setValidLink] = useState(false)
   const searchParams = useSearchParams()
 
@@ -27,10 +26,9 @@ export default function ResetPassword() {
       verifyPasswordResetCode(auth, code)
         .then((email) => {
           setOobCode(code)
-          setEmail(email)
           setValidLink(true)
         })
-        .catch(() => {
+        .catch((error: AuthError) => {
           toast.error('Invalid or expired reset link')
           setValidLink(false)
         })
@@ -39,10 +37,12 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
     if (newPassword !== confirmPassword) {
       toast.error('Passwords do not match')
       return
     }
+    
     if (newPassword.length < 6) {
       toast.error('Password must be at least 6 characters')
       return
@@ -54,7 +54,8 @@ export default function ResetPassword() {
       toast.success('Password reset successfully! You can now login.')
       window.location.href = '/auth/login'
     } catch (error) {
-      toast.error('Failed to reset password. Please try again.')
+      const authError = error as AuthError
+      toast.error(authError.message || 'Failed to reset password. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -102,11 +103,7 @@ export default function ResetPassword() {
                 className="absolute right-0 top-0 h-full px-3 shadow-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
           </div>
@@ -130,11 +127,7 @@ export default function ResetPassword() {
                 className="absolute right-0 top-0 h-full px-3 shadow-none"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
           </div>

@@ -40,8 +40,8 @@ export default function ContactPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       toast.success('Message sent successfully!')
       setFormData({ name: '', email: '', message: '' })
-    } catch (error) {
-      toast.error('Something went wrong. Please try again.')
+    } catch {
+      toast.error('Failed to send message. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -57,7 +57,7 @@ export default function ContactPage() {
       >
         <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 text-primary">Contact Us</h1>
         <p className="text-lg sm:text-xl text-muted-foreground">
-          We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+          We&apos;d love to hear from you. Send us a message and we'll respond as soon as possible.
         </p>
       </motion.div>
 

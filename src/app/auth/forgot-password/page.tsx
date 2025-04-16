@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { sendPasswordResetEmail } from 'firebase/auth'
+import { sendPasswordResetEmail, AuthError } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export default function ForgotPassword() {
@@ -22,8 +22,9 @@ export default function ForgotPassword() {
       await sendPasswordResetEmail(auth, email)
       setEmailSent(true)
       toast.success('Password reset email sent! Check your inbox.')
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset email')
+    } catch (error) {
+      const authError = error as AuthError
+      toast.error(authError.message || 'Failed to send reset email')
     } finally {
       setLoading(false)
     }
@@ -54,7 +55,7 @@ export default function ForgotPassword() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                We've sent password reset instructions to <span className="font-medium">{email}</span>.
+                We&apos;ve sent password reset instructions to <span className="font-medium">{email}</span>.
               </motion.p>
               <motion.p 
                 className="text-sm text-muted-foreground"
@@ -62,7 +63,7 @@ export default function ForgotPassword() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                Didn't receive the email? Check your spam folder or try again.
+                Didn&apos;t receive the email? Check your spam folder or try again.
               </motion.p>
               <motion.div
                 className="pt-4"

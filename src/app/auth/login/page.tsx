@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff } from 'lucide-react'
 import { auth } from '@/lib/firebase'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, AuthError } from 'firebase/auth'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -32,8 +32,13 @@ export default function LoginPage() {
       // Redirect to the stored redirect URL or home page
       const redirectTo = searchParams.get('redirect') || '/'
       router.push(redirectTo)
-    } catch (error: any) {
-      toast.error(getUserFriendlyError(error.code))
+    } catch (error) {
+      if (error instanceof Error) {
+        const authError = error as AuthError
+        toast.error(getUserFriendlyError(authError.code))
+      } else {
+        toast.error('An unknown error occurred')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -120,9 +125,9 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-4 text-center text-xs sm:text-sm">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
-              href="/auth/signup?redirect=${searchParams.get('redirect') || ''}"
+              href={`/auth/signup?redirect=${searchParams.get('redirect') || ''}`}
               className="text-primary underline hover:text-primary/80"
             >
               Sign up

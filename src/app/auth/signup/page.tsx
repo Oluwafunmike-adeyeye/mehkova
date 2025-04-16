@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff } from 'lucide-react'
 import { auth } from '@/lib/firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, AuthError } from 'firebase/auth'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
@@ -35,8 +35,9 @@ export default function SignUpPage() {
       await createUserWithEmailAndPassword(auth, email, password)
       toast.success('Account created successfully')
       router.push('/')
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error) {
+      const authError = error as AuthError
+      toast.error(getUserFriendlyError(authError.code))
     } finally {
       setLoading(false)
     }
@@ -81,6 +82,7 @@ export default function SignUpPage() {
                 placeholder='*********'
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
                 className="mt-1 text-sm sm:text-base"
               />
               <Button
@@ -107,6 +109,7 @@ export default function SignUpPage() {
                 placeholder='*********'
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                minLength={6}
                 className="mt-1 text-sm sm:text-base"
               />
               <Button
@@ -143,4 +146,20 @@ export default function SignUpPage() {
       </motion.div>
     </div>
   )
+}
+
+// Helper function to convert Firebase error codes to user-friendly messages
+function getUserFriendlyError(errorCode: string): string {
+  switch (errorCode) {
+    case 'auth/email-already-in-use':
+      return 'This email is already in use'
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address'
+    case 'auth/operation-not-allowed':
+      return 'Account creation is currently disabled'
+    case 'auth/weak-password':
+      return 'Password should be at least 6 characters'
+    default:
+      return 'Account creation failed. Please try again'
+  }
 }

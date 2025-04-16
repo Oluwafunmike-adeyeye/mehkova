@@ -74,7 +74,7 @@ export default function AboutPage() {
             { name: 'Lola K.', quote: 'I love their unique designs. Always get compliments when I wear Mehkova pieces.' }].map((testimonial, idx) => (
             <Card key={idx} className="p-6 text-sm sm:text-base text-center">
               <Quote className="w-6 h-6 text-primary mx-auto mb-4" aria-hidden="true" />
-              <p className="italic text-muted-foreground mb-3">"{testimonial.quote}"</p>
+              <p className="italic text-muted-foreground mb-3">&quot;{testimonial.quote}&quot;</p>
               <p className="font-semibold text-primary">{testimonial.name}</p>
             </Card>
           ))}
@@ -92,7 +92,7 @@ export default function AboutPage() {
           className="rounded-full mx-auto mb-4"
         />
         <p className="text-base sm:text-lg text-muted-foreground">
-          Hello, I am Mehkova's founder. I started this brand to empower people through elegant, accessible fashion.
+          Hello, I am Mehkova&apos;s founder. I started this brand to empower people through elegant, accessible fashion.
           Every design reflects a passion for beauty, culture, and confidence. Thank you for being part of the journey.
         </p>
       </section>

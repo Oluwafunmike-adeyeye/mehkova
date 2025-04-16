@@ -188,7 +188,7 @@ export const PaymentMethods = () => {
       {paymentMethod === 'paypal' && (
         <div className="bg-muted p-3 sm:p-4 rounded-lg">
           <p className="text-xs sm:text-sm">
-            You'll be redirected to PayPal to complete your purchase securely.
+            You&apos;ll be redirected to PayPal to complete your purchase securely.
           </p>
         </div>
       )}

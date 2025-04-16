@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useCart } from '@/lib/store'  
-import { Loader2, Minus, Plus, ShoppingCart, ArrowLeft } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import Image from 'next/image'
 
@@ -141,7 +141,6 @@ export default function ProductPage() {
     }
 
     addToCart(cartItem)
-    toast.success(`${quantity} ${product.name} added to cart`)
   }
 
   const handleQuantityChange = (change: number) => {
