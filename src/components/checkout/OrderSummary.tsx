@@ -15,7 +15,7 @@ type OrderSummaryProps = {
 
 export const OrderSummary = ({ isProcessing, onSubmit }: OrderSummaryProps) => {
   const { items, total } = useCartStore();
-  const shippingCost = 5000; // $50.00 in cents
+  const shippingCost = 5000;
   const orderTotal = total() + shippingCost;
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 

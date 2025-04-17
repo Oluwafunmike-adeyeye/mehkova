@@ -1,3 +1,4 @@
+// hooks/useCheckout.ts
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -33,15 +34,14 @@ const simulatePayment = async (): Promise<MockPaymentResponse> => {
 
 export const useCheckout = () => {
   const router = useRouter();
-  const { clearCart, items: cartItems } = useCartStore(); 
+  const { clearCart } = useCartStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const validateForm = (formData: CheckoutFormData) => {
     const errors: Record<string, string> = {};
     
-    if (!cartItems.length) errors.cart = 'Your cart is empty';
-    
+    // Your existing validation logic
     const shippingError = validateShippingInfo(formData);
     if (shippingError) errors.shipping = shippingError;
 
@@ -66,7 +66,13 @@ export const useCheckout = () => {
         throw new Error(paymentResult.error || 'Payment processing failed');
       }
 
-      clearCart();
+      // Show success message
+      toast.success('Order completed successfully!');
+      
+      // Clear cart silently (without triggering another toast)
+      clearCart({ silent: true });
+      
+      // Redirect to success page
       router.push(`/checkout/success?order_id=${paymentResult.orderId}`);
       
       return true;

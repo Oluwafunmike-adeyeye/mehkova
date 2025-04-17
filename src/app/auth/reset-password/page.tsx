@@ -6,12 +6,9 @@ import { auth } from '@/lib/firebase'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Suspense } from 'react'
-
-
 
 export default function ResetPassword() {
   return (
@@ -28,20 +25,17 @@ function ResetPasswordComponent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [oobCode, setOobCode] = useState('')
-  const [validLink, setValidLink] = useState(false)
   const searchParams = useSearchParams()
 
   useEffect(() => {
     const code = searchParams.get('oobCode')
     if (code) {
       verifyPasswordResetCode(auth, code)
-        .then(() => {  // Removed unused email parameter
+        .then(() => {
           setOobCode(code)
-          setValidLink(true)
         })
         .catch((error: AuthError) => {
           toast.error(error.message || 'Invalid or expired reset link')
-          setValidLink(false)
         })
     }
   }, [searchParams])
@@ -70,23 +64,6 @@ function ResetPasswordComponent() {
     } finally {
       setLoading(false)
     }
-  }
-
-  if (!validLink) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6 rounded-3xl">
-          <h2 className="text-xl font-bold mb-4">Invalid Reset Link</h2>
-          <p className="mb-4 text-muted-foreground">This password reset link is invalid or has expired.</p>
-          <Link 
-            href="/auth/forgot-password" 
-            className="text-primary hover:underline flex items-center"
-          >
-            Request a new reset link
-          </Link>
-        </Card>
-      </div>
-    )
   }
 
   return (

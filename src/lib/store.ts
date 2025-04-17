@@ -105,7 +105,7 @@ export const useCartStore = create<CartStore>()(
         const hadItems = get().items.length > 0;
         set({ items: [] });
         if (hadItems && !silent) {
-          toast.success('Order ompleted');
+          toast.success('Order completed');
         }
       },
       total: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),

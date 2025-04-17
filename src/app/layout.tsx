@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Mehkova"
   },
   description: "Discover the latest fashion trends and exquisite jewelry collections in Nigeria",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL('https://mehkova.netlify.app'),
   openGraph: {
     type: 'website',
     locale: 'en_NG',

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
-import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/auth-context';
 import { useCartStore } from '@/lib/store';
@@ -14,21 +13,24 @@ import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { CheckoutFormData } from '@/types/checkout';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { Suspense } from 'react'
+import { Suspense } from 'react';
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center h-screen">
+      <Loader2 className="h-12 w-12 animate-spin" />
+    </div>}>
       <CheckoutContent />
     </Suspense>
-  )
+  );
 }
+
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
-  const { items, clearCart } = useCartStore();
-  const { isProcessing, processOrder } = useCheckout();
+  const { items } = useCartStore();
+  const { isProcessing, processOrder, formErrors } = useCheckout();
   const [error, setError] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -37,7 +39,8 @@ function CheckoutContent() {
       name: user?.displayName || '',
       email: user?.email || '',
       paymentMethod: 'card',
-    }
+    },
+    mode: 'onBlur'
   });
 
   const onSubmit = methods.handleSubmit(async (data) => {
@@ -46,20 +49,10 @@ function CheckoutContent() {
     
     try {
       await processOrder(data);
-      
-      // Clear cart after showing success message
-      setTimeout(() => {
-        clearCart();
-      }, 100);
-      
-      // Smooth navigation to success page
-      router.push('/checkout/success');
-      
     } catch (error) {
       setIsNavigating(false);
       console.error('Checkout error:', error);
       setError(error instanceof Error ? error.message : 'Failed to process your order');
-      toast.error('Failed to complete your order');
     }
   });
 
@@ -107,6 +100,20 @@ function CheckoutContent() {
           className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg text-center"
         >
           {error}
+        </motion.div>
+      )}
+
+      {Object.keys(formErrors).length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg"
+        >
+          <ul className="list-disc pl-5">
+            {Object.entries(formErrors).map(([key, value]) => (
+              <li key={key}>{value}</li>
+            ))}
+          </ul>
         </motion.div>
       )}
 
