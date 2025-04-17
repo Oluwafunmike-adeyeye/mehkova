@@ -13,23 +13,12 @@ interface MockPaymentResponse {
 }
 
 const simulatePayment = async (): Promise<MockPaymentResponse> => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Randomly fail 10% of the time for demo purposes
   const shouldFail = Math.random() < 0.1;
   
-  if (shouldFail) {
-    return {
-      success: false,
-      error: 'Payment processor declined transaction'
-    };
-  }
-
-  return { 
-    success: true, 
-    orderId: `ord_${Math.random().toString(36).substring(2, 10)}`
-  };
+  return shouldFail 
+    ? { success: false, error: 'Payment processor declined transaction' }
+    : { success: true, orderId: `ord_${Math.random().toString(36).substring(2, 10)}` };
 };
 
 export const useCheckout = () => {
@@ -41,7 +30,6 @@ export const useCheckout = () => {
   const validateForm = (formData: CheckoutFormData) => {
     const errors: Record<string, string> = {};
     
-    // Your existing validation logic
     const shippingError = validateShippingInfo(formData);
     if (shippingError) errors.shipping = shippingError;
 
@@ -66,22 +54,17 @@ export const useCheckout = () => {
         throw new Error(paymentResult.error || 'Payment processing failed');
       }
 
-      // Show success message
-      toast.success('Order completed successfully!');
-      
-      // Clear cart silently (without triggering another toast)
       clearCart({ silent: true });
       
-      // Redirect to success page
-      router.push(`/checkout/success?order_id=${paymentResult.orderId}`);
+      // Redirect first and wait for it to complete
+      await router.push(`/checkout/success?order_id=${paymentResult.orderId}`);
+      
+      // Only show toast after navigation is complete
+      toast.success('Order completed successfully!');
       
       return true;
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error('An unexpected error occurred');
-      }
+      toast.error(error instanceof Error ? error.message : 'Payment failed');
       return false;
     } finally {
       setIsProcessing(false);

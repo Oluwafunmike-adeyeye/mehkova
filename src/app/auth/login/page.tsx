@@ -36,7 +36,7 @@ function LoginContent() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      toast.success('Successfully logged in')
+      toast.success('Login successfully')
       
       // Redirect to the stored redirect URL or home page
       const redirectTo = searchParams.get('redirect') || '/'

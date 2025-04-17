@@ -205,12 +205,12 @@ function CartContent() {
                 </div>
                 <div className="flex justify-between text-sm sm:text-base">
                   <span>Shipping</span>
-                  <span>₦2,000</span>
+                  <span>₦5,000</span>
                 </div>
                 <div className="border-t pt-3 sm:pt-4 font-bold text-base sm:text-lg">
                   <div className="flex justify-between">
                     <span>Total</span>
-                    <span>₦{(total() + 2000).toLocaleString()}</span>
+                    <span>₦{(total() + 5000).toLocaleString()}</span>
                   </div>
                 </div>
               </div>

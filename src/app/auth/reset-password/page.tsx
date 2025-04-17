@@ -88,7 +88,7 @@ function ResetPasswordComponent() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-0 h-full px-3 shadow-none"
+                className="absolute right-0 top-0 h-full px-3 shadow-none hover:shadow-none"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

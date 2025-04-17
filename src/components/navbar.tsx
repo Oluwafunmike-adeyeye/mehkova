@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { ShoppingCart, Sun, Moon, Menu, LogOut } from 'lucide-react'
+import { ShoppingCart, Sun, Moon, Menu, LogOut, User as UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTheme } from 'next-themes'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
@@ -25,6 +25,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const cartItems = useCartStore((state) => state.items)
 
   const NAV_ROUTES: NavRoute[] = [
@@ -35,6 +36,7 @@ export default function Navbar() {
   ]
 
   useEffect(() => {
+    setIsMounted(true)
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
       setIsLoading(false)
@@ -57,94 +59,99 @@ export default function Navbar() {
     return email ? email.charAt(0).toUpperCase() : 'U'
   }
 
+  if (!isMounted) return null
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-16">
-      <nav className="container flex h-full items-center justify-between px-4 sm:px-6">
+      <nav className="container flex items-center justify-between h-full px-4 sm:px-6">
         {/* Mobile Menu Button and Logo */}
-        <div className="flex items-center gap-2 h-full">
+        <div className="flex items-center gap-2">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="h-10 w-10">
+              <Button variant="ghost" size="icon" className="h-10 w-10 shadow-none">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
             
-            <SheetContent side="left" className="w-[280px] sm:w-[300px]">
-              <div className="flex flex-col h-full">
-                <SheetTitle className="mb-6">
+            <SheetContent
+              side="left"
+              className="w-[280px] sm:w-[300px] max-h-screen flex flex-col"
+            >
+              <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
+                <SheetTitle className="mb-6 px-4">
                   <Link href="/" onClick={() => setIsOpen(false)}>
                     <span className="text-xl font-bold text-primary dark:text-primary-foreground">
                       MEHKOVA
                     </span>
                   </Link>
                 </SheetTitle>
-                
-                <nav className="flex-1 flex flex-col gap-2">
+
+                <nav className="flex flex-col gap-2 px-4">
                   {NAV_ROUTES.map((route) => (
                     <Link
                       key={route.href}
                       href={route.href}
+                      onClick={() => setIsOpen(false)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        pathname === route.href 
-                          ? 'bg-primary/10 text-primary' 
+                        pathname === route.href
+                          ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:bg-accent'
                       }`}
-                      onClick={() => setIsOpen(false)}
                     >
                       {route.label}
                     </Link>
                   ))}
                 </nav>
+              </div>
 
-                <div className="mt-auto pt-4 border-t">
-                  {isLoading ? (
-                    <div className="space-y-2 animate-pulse">
-                      <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              <div className="border-t px-4 py-4">
+                {isLoading ? (
+                  <div className="space-y-2 animate-pulse">
+                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                  </div>
+                ) : currentUser ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage src={currentUser.photoURL || undefined} />
+                        <AvatarFallback className="bg-primary text-white text-sm">
+                          {getUserInitial(currentUser.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium truncate max-w-[150px]">
+                        {currentUser.email}
+                      </span>
                     </div>
-                  ) : currentUser ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 px-4 py-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={currentUser.photoURL || undefined} />
-                          <AvatarFallback className="bg-primary text-white text-sm">
-                            {getUserInitial(currentUser.email)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium truncate">
-                          {currentUser.email?.split('@')[0] || 'User'}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          handleLogout()
-                          setIsOpen(false)
-                        }}
-                        className="w-full px-4 py-2 rounded-lg text-sm font-medium text-left text-muted-foreground hover:bg-accent flex items-center gap-2"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link
-                        href="/auth/login"
-                        className="px-4 py-2 rounded-lg text-sm font-medium text-center text-primary border border-primary hover:bg-primary/10"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Log in
-                      </Link>
-                      <Link
-                        href="/auth/signup"
-                        className="px-4 py-2 rounded-lg text-sm font-medium text-center bg-primary text-white hover:bg-primary/90"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Sign up
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        setIsOpen(false)
+                      }}
+                      className="w-full px-4 py-2 rounded-lg text-sm font-medium text-left text-muted-foreground hover:bg-accent flex items-center gap-2"
+                    >
+                      <LogOut className="h-4 w-4 flex-shrink-0" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href="/auth/login"
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-center text-primary border border-primary hover:bg-primary/10"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-center bg-primary text-white hover:bg-primary/90"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Sign up
+                    </Link>
+                  </div>
+                )}
               </div>
             </SheetContent>
           </Sheet>
@@ -175,11 +182,11 @@ export default function Navbar() {
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 shadow-none"
+            className="h-9 w-9 sm:h-10 sm:w-10 shadow-none"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle theme"
           >
@@ -188,11 +195,11 @@ export default function Navbar() {
           </Button>
 
           <Link href="/cart" aria-label="Shopping cart">
-            <Button variant="ghost" size="icon" className="h-10 w-10 relative shadow-none dark:text-gray-400">
-              <ShoppingCart className="h-7 w-7" />
+            <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 relative shadow-none dark:text-gray-400">
+              <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
               {cartItems.length > 0 && (
-                <span className="absolute top-1 right-1 h-4 w-4 rounded-full p-2 bg-primary text-[10px] text-white flex items-center justify-center ">
-                  {cartItems.length}
+                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-primary text-[10px] text-white flex items-center justify-center">
+                  {cartItems.length > 9 ? '9+' : cartItems.length}
                 </span>
               )}
             </Button>
@@ -203,36 +210,52 @@ export default function Navbar() {
               <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
             </div>
           ) : currentUser ? (
-            <div className="hidden md:flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={currentUser.photoURL || undefined} />
-                <AvatarFallback className="bg-primary text-white text-sm">
-                  {getUserInitial(currentUser.email)}
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 rounded-md gap-1 text-primary hover:bg-primary/10"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only">Logout</span>
-              </Button>
-            </div>
+            <>
+              <div className="hidden md:flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={currentUser.photoURL || undefined} />
+                  <AvatarFallback className="bg-primary text-white text-sm">
+                    {getUserInitial(currentUser.email)}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 rounded-md gap-1 text-primary hover:bg-primary/10"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Logout</span>
+                </Button>
+              </div>
+              {/* Mobile user icon */}
+              <Link href="/account" className="md:hidden">
+                <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
+                  <UserIcon className="h-5 w-5" />
+                </Button>
+              </Link>
+            </>
           ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Link href="/auth/login">
-                <Button variant="outline" size="sm" className="h-8 rounded-xl">
-                  Log in
+            <>
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/auth/login">
+                  <Button variant="outline" size="sm" className="h-8 rounded-xl">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button size="sm" className="h-8 rounded-xl">
+                    Sign up
+                  </Button>
+                </Link>
+              </div>
+              {/* Mobile auth buttons */}
+              <Link href="/auth/login" className="md:hidden">
+                <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
+                  <UserIcon className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/auth/signup">
-                <Button size="sm" className="h-8 rounded-xl">
-                  Sign up
-                </Button>
-              </Link>
-            </div>
+            </>
           )}
         </div>
       </nav>
